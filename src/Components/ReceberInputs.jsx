@@ -1,4 +1,5 @@
 import "../assets/ReceberInputs.css";
+import { MediaDosNumeros } from "../ProcessamentoDosDados/MediaDosNumeros";
 import React, { useState, useRef } from "react";
 
 function Inputs() {
@@ -146,6 +147,7 @@ function Inputs() {
       <button onClick={handleCalcular} disabled={loading}>
         {loading ? "Enviando..." : "Calcular"}
       </button>
+      <MediaDosNumeros texto={texto} />
     </div>
   );
 }
