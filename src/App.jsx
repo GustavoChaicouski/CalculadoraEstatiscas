@@ -2,6 +2,7 @@ import { useState } from "react";
 import Cabecalho from "./components/Header";
 import Receber from "./Components/ReceberInputs";
 import PrintNumeros from "./Components/Numeros";
+import "./assets/App.css";
 
 function App() {
   const [texto, setTexto] = useState("");

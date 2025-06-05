@@ -1,6 +1,12 @@
 .MostrarNum {
+  background: rgb(238, 238, 238);
+  padding: 24px;
+  border-radius: 12px;
+  position: absolute;
+  top: 17vh;
+  margin-left: 30vw;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.329);
 }
