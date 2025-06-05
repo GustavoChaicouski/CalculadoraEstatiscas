@@ -93,10 +93,12 @@ function Inputs({ texto, setTexto }) {
         id="texto"
         value={texto}
         onChange={handleTextoChange}
-        placeholder="Digite seu texto aqui..."
       ></textarea>
 
+      <p>ou</p>
+
       <div
+        className="DropArea"
         id="DropArea"
         onClick={handleClick}
         onDrop={handleDrop}
@@ -125,8 +127,8 @@ function Inputs({ texto, setTexto }) {
           </>
         ) : (
           <>
-            ou <br /> jogue os arquivos aqui <br /> ou <br />
-            <span className="DropInstruction">(clique para selecionar)</span>
+            jogue os arquivos aqui <br /> ou <br />
+            <span className="DropInstruction">clique para selecionar</span>
           </>
         )}
 

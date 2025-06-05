@@ -1,4 +1,5 @@
 import React from "react";
+import "../assets/MostrarNumCss.css";
 
 const extrairNumeros = (texto) => {
   const regex = /-?\d+(\.\d+)?/g;
@@ -58,7 +59,7 @@ export function MediaDosNumeros({ texto }) {
   const Menor = React.useMemo(() => MenorNumero(numeros), [numeros]);
 
   return (
-    <div>
+    <div className="MostrarNum">
       <p>Números encontrados: {numeros.join(", ")}</p>
       {numeros.length > 0 ? (
         <p>Média dos números: {media.toFixed(2)}</p>
