@@ -1,14 +1,17 @@
+import { useState } from "react";
 import Cabecalho from "./components/Header";
 import Receber from "./Components/ReceberInputs";
-
-import "./assets/App.css";
+import PrintNumeros from "./Components/Numeros";
 
 function App() {
+  const [texto, setTexto] = useState("");
+
   return (
     <div>
       <Cabecalho />
       <main>
-        <Receber />
+        <Receber texto={texto} setTexto={setTexto} />
+        <PrintNumeros texto={texto} />
       </main>
     </div>
   );

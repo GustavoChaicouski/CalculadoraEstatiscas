@@ -1,11 +1,10 @@
 import "../assets/ReceberInputs.css";
-import { MediaDosNumeros } from "../ProcessamentoDosDados/MediaDosNumeros";
+
 import React, { useState, useRef } from "react";
 
-function Inputs() {
+function Inputs({ texto, setTexto }) {
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(null);
-  const [texto, setTexto] = useState("");
   const [loading, setLoading] = useState(false);
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -48,7 +47,7 @@ function Inputs() {
 
   // Se o usuário digitar texto, limpa o arquivo para evitar confusão
   const handleTextoChange = (e) => {
-    setTexto(e.target.value);
+    setTexto(e.target.value); // usa a prop setTexto
     if (file) {
       setFile(null);
     }
@@ -147,7 +146,6 @@ function Inputs() {
       <button onClick={handleCalcular} disabled={loading}>
         {loading ? "Enviando..." : "Calcular"}
       </button>
-      <MediaDosNumeros texto={texto} />
     </div>
   );
 }
