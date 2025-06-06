@@ -11,8 +11,7 @@ function App() {
   const palavras = texto
     .split(/[\s,.;:\n\t]+/)
     .map((p) => p.trim())
-    .filter((p) => p.length > 0);
-
+    .filter((p) => /^[A-Za-zÀ-ÿ]+$/.test(p));
   return (
     <div>
       <Cabecalho />

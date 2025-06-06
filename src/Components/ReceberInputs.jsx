@@ -1,22 +1,23 @@
 import "../assets/ReceberInputs.css";
-
 import React, { useState, useRef } from "react";
 
 function Inputs({ texto, setTexto }) {
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [textoTemp, setTextoTemp] = useState("");
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       if (selectedFile.size > MAX_FILE_SIZE) {
-        alert("Arquivo muito grande. O tamanho máximo permitido é 5MB.");
+        console.log("Arquivo muito grande. O tamanho máximo permitido é 5MB.");
         return;
       }
       setFile(selectedFile);
+      setTextoTemp("");
     }
   };
 
@@ -25,10 +26,11 @@ function Inputs({ texto, setTexto }) {
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
       if (droppedFile.size > MAX_FILE_SIZE) {
-        alert("Arquivo muito grande. O tamanho máximo permitido é 5MB.");
+        console.log("Arquivo muito grande. O tamanho máximo permitido é 5MB.");
         return;
       }
       setFile(droppedFile);
+      setTextoTemp("");
     }
   };
 
@@ -40,29 +42,27 @@ function Inputs({ texto, setTexto }) {
     fileInputRef.current.click();
   };
 
-  // Limpar arquivo selecionado
   const handleRemoveFile = () => {
     setFile(null);
   };
 
-  // Se o usuário digitar texto, limpa o arquivo para evitar confusão
   const handleTextoChange = (e) => {
-    setTexto(e.target.value); // usa a prop setTexto
+    setTextoTemp(e.target.value);
     if (file) {
       setFile(null);
     }
   };
 
   const handleCalcular = () => {
-    if (loading) return; // evita múltiplos cliques
+    if (loading) return;
 
-    if (texto.trim()) {
-      console.log("Texto digitado:", texto);
-      alert("Texto processado com sucesso!");
-      // aqui você envia ou processa o texto
+    if (textoTemp.trim()) {
+      setTexto(textoTemp);
+      console.log("Texto digitado:", textoTemp);
     } else if (file) {
       setLoading(true);
       console.log("Arquivo enviado:", file.name);
+
       const formData = new FormData();
       formData.append("arquivo", file);
 
@@ -70,18 +70,19 @@ function Inputs({ texto, setTexto }) {
         method: "POST",
         body: formData,
       })
-        .then((res) =>
-          res.ok
-            ? alert("Arquivo enviado com sucesso!")
-            : alert("Erro ao enviar arquivo")
-        )
+        .then((res) => {
+          if (res.ok) {
+            console.log("Arquivo enviado com sucesso!");
+          } else {
+            console.log("Erro ao enviar arquivo");
+          }
+        })
         .catch((err) => {
           console.error("Erro:", err);
-          alert("Erro ao enviar arquivo");
         })
         .finally(() => setLoading(false));
     } else {
-      alert("Por favor, insira um texto ou envie um arquivo.");
+      console.log("Nenhum texto ou arquivo fornecido.");
     }
   };
 
@@ -91,7 +92,7 @@ function Inputs({ texto, setTexto }) {
       <textarea
         name="texto"
         id="texto"
-        value={texto}
+        value={textoTemp}
         onChange={handleTextoChange}
       ></textarea>
 
@@ -111,7 +112,6 @@ function Inputs({ texto, setTexto }) {
             handleClick();
           }
         }}
-        style={{ cursor: "pointer" }}
       >
         {file ? (
           <>

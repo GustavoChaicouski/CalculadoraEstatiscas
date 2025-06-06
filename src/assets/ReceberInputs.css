@@ -12,6 +12,7 @@
 }
 textarea {
   border-radius: 12px;
+  height: 40vh;
   resize: none;
 }
 .DropArea {
@@ -36,4 +37,15 @@ textarea {
   100% {
     background-position: 100% 0%;
   }
+}
+button {
+  background-color: white;
+  padding: 8px;
+  border-radius: 12px;
+  border: none;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+button:hover {
+  transform: scale(1.05);
+  box-shadow: #ffffff 0px 0px 10px 2px;
 }

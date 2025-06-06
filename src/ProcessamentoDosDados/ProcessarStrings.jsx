@@ -1,8 +1,8 @@
+import "../assets/MostrarStrings.css";
+
 export default function CalcularEstatisticasStrings({ texto }) {
   if (!texto || texto.length === 0)
-    return <p>Nenhuma string para processar.</p>;
-
-  // Aqui `texto` já é uma array de palavras
+    return <p className="MostrarStrings">Nenhuma string para processar.</p>;
 
   const total = texto.length;
   const unicas = [...new Set(texto)].sort();
@@ -20,7 +20,7 @@ export default function CalcularEstatisticasStrings({ texto }) {
   );
 
   return (
-    <div className="bg-white p-4 rounded shadow mt-4">
+    <div className="MostrarStrings">
       <h2 className="text-xl font-semibold text-blue-700 mb-2">
         Estatísticas de Strings
       </h2>
