@@ -53,6 +53,51 @@ function Inputs({ texto, setTexto }) {
     }
   };
 
+  const handleFileRead = (file) => {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const textoArquivo = event.target.result;
+      const numeros = textoArquivo
+        .split(/[\s,;]+/)
+        .map((v) => v.trim())
+        .filter((v) => !isNaN(v) && v !== "")
+        .map(Number);
+
+      console.log("Números extraídos do arquivo:", numeros);
+
+      if (numeros.length === 0) {
+        console.log("Nenhum número válido encontrado no arquivo.");
+        return;
+      }
+
+      const media = calcularMedia(numeros);
+      const mediana = calcularMediana(numeros);
+
+      console.log("Média:", media);
+      console.log("Mediana:", mediana);
+
+      // Se quiser mostrar os dados na tela, use setTexto ou outro estado aqui
+      setTexto(`Média: ${media}\nMediana: ${mediana}`);
+    };
+
+    reader.readAsText(file);
+  };
+
+  const calcularMedia = (valores) => {
+    const soma = valores.reduce((acc, val) => acc + val, 0);
+    return (soma / valores.length).toFixed(2);
+  };
+
+  const calcularMediana = (valores) => {
+    const ordenados = [...valores].sort((a, b) => a - b);
+    const meio = Math.floor(ordenados.length / 2);
+    if (ordenados.length % 2 === 0) {
+      return ((ordenados[meio - 1] + ordenados[meio]) / 2).toFixed(2);
+    } else {
+      return ordenados[meio].toFixed(2);
+    }
+  };
+
   const handleCalcular = () => {
     if (loading) return;
 
@@ -63,24 +108,8 @@ function Inputs({ texto, setTexto }) {
       setLoading(true);
       console.log("Arquivo enviado:", file.name);
 
-      const formData = new FormData();
-      formData.append("arquivo", file);
-
-      fetch("/upload", {
-        method: "POST",
-        body: formData,
-      })
-        .then((res) => {
-          if (res.ok) {
-            console.log("Arquivo enviado com sucesso!");
-          } else {
-            console.log("Erro ao enviar arquivo");
-          }
-        })
-        .catch((err) => {
-          console.error("Erro:", err);
-        })
-        .finally(() => setLoading(false));
+      handleFileRead(file); // <-- Aqui é onde lemos e processamos o arquivo
+      setLoading(false);
     } else {
       console.log("Nenhum texto ou arquivo fornecido.");
     }
@@ -136,11 +165,7 @@ function Inputs({ texto, setTexto }) {
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
-          accept="
-            application/pdf,
-            application/msword,
-            application/vnd.openxmlformats-officedocument.wordprocessingml.document,
-            text/plain"
+          accept="text/plain"
           style={{ display: "none" }}
         />
       </div>
