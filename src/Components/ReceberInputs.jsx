@@ -1,24 +1,23 @@
 import "../assets/ReceberInputs.css";
+
 import React, { useState, useRef } from "react";
 
 function Inputs({ texto, setTexto }) {
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [textoTemp, setTextoTemp] = useState("");
-  const [resultado, setResultado] = useState(""); // <--- Novo estado
+  const [textoTemp, setTextoTemp] = useState(""); // Novo estado temporário
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       if (selectedFile.size > MAX_FILE_SIZE) {
-        console.log("Arquivo muito grande. O tamanho máximo permitido é 5MB.");
+        alert("Arquivo muito grande. O tamanho máximo permitido é 5MB.");
         return;
       }
       setFile(selectedFile);
-      setTextoTemp("");
     }
   };
 
@@ -27,11 +26,10 @@ function Inputs({ texto, setTexto }) {
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
       if (droppedFile.size > MAX_FILE_SIZE) {
-        console.log("Arquivo muito grande. O tamanho máximo permitido é 5MB.");
+        alert("Arquivo muito grande. O tamanho máximo permitido é 5MB.");
         return;
       }
       setFile(droppedFile);
-      setTextoTemp("");
     }
   };
 
@@ -47,52 +45,11 @@ function Inputs({ texto, setTexto }) {
     setFile(null);
   };
 
-  const handleTextoChange = (e) => {
+  // Atualiza apenas o texto temporário; limpa arquivo, se houver
+  const handleTextoTempChange = (e) => {
     setTextoTemp(e.target.value);
     if (file) {
       setFile(null);
-    }
-  };
-
-  const handleFileRead = (file) => {
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      const textoArquivo = event.target.result;
-      const numeros = textoArquivo
-        .split(/[\s,;]+/)
-        .map((v) => v.trim())
-        .filter((v) => !isNaN(v) && v !== "")
-        .map(Number);
-
-      console.log("Números extraídos do arquivo:", numeros);
-
-      if (numeros.length === 0) {
-        console.log("Nenhum número válido encontrado no arquivo.");
-        setResultado("Nenhum número válido encontrado no arquivo.");
-        return;
-      }
-
-      const media = calcularMedia(numeros);
-      const mediana = calcularMediana(numeros);
-
-      setResultado(`Média: ${media}\nMediana: ${mediana}`);
-    };
-
-    reader.readAsText(file);
-  };
-
-  const calcularMedia = (valores) => {
-    const soma = valores.reduce((acc, val) => acc + val, 0);
-    return (soma / valores.length).toFixed(2);
-  };
-
-  const calcularMediana = (valores) => {
-    const ordenados = [...valores].sort((a, b) => a - b);
-    const meio = Math.floor(ordenados.length / 2);
-    if (ordenados.length % 2 === 0) {
-      return ((ordenados[meio - 1] + ordenados[meio]) / 2).toFixed(2);
-    } else {
-      return ordenados[meio].toFixed(2);
     }
   };
 
@@ -100,36 +57,47 @@ function Inputs({ texto, setTexto }) {
     if (loading) return;
 
     if (textoTemp.trim()) {
-      setTexto(textoTemp);
+      setTexto(textoTemp); // agora atualiza o "texto real"
       console.log("Texto digitado:", textoTemp);
-      setResultado("Texto enviado manualmente. (Funcionalidade futura)");
     } else if (file) {
       setLoading(true);
       console.log("Arquivo enviado:", file.name);
+      const formData = new FormData();
+      formData.append("arquivo", file);
 
-      handleFileRead(file);
-      setLoading(false);
+      fetch("/upload", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) =>
+          res.ok
+            ? alert("Arquivo enviado com sucesso!")
+            : alert("Erro ao enviar arquivo")
+        )
+        .catch((err) => {
+          console.error("Erro:", err);
+          alert("Erro ao enviar arquivo");
+        })
+        .finally(() => setLoading(false));
     } else {
-      console.log("Nenhum texto ou arquivo fornecido.");
-      setResultado("Nenhum texto ou arquivo fornecido.");
+      alert("Por favor, insira um texto ou envie um arquivo.");
     }
   };
 
   return (
-    <div className="InputsAreas space-y-4">
-      <label htmlFor="texto" className="block font-semibold">Coloque o texto aqui:</label>
+    <div className="InputsAreas">
+      <label htmlFor="texto">Coloque o texto aqui:</label>
       <textarea
         name="texto"
         id="texto"
         value={textoTemp}
-        onChange={handleTextoChange}
-        className="w-full p-2 border rounded resize-y"
+        onChange={handleTextoTempChange}
       ></textarea>
 
-      <p className="text-center font-medium">ou</p>
+      <p>ou</p>
 
       <div
-        className="DropArea bg-gradient-to-r from-pink-500 to-purple-500 text-white p-4 rounded text-center cursor-pointer"
+        className="DropArea"
         id="DropArea"
         onClick={handleClick}
         onDrop={handleDrop}
@@ -142,16 +110,16 @@ function Inputs({ texto, setTexto }) {
             handleClick();
           }
         }}
+        style={{ cursor: "pointer" }}
       >
         {file ? (
           <>
-            <p className="font-semibold">Arquivo selecionado: {file.name}</p>
+            <p>Arquivo selecionado: {file.name}</p>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleRemoveFile();
               }}
-              className="mt-2 bg-white text-red-600 px-3 py-1 rounded hover:bg-red-100"
             >
               Remover arquivo
             </button>
@@ -159,7 +127,7 @@ function Inputs({ texto, setTexto }) {
         ) : (
           <>
             jogue os arquivos aqui <br /> ou <br />
-            <span className="DropInstruction font-semibold underline">clique para selecionar</span>
+            <span className="DropInstruction">clique para selecionar</span>
           </>
         )}
 
@@ -167,27 +135,18 @@ function Inputs({ texto, setTexto }) {
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
-          accept="text/plain"
+          accept="
+            application/pdf,
+            application/msword,
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+            text/plain"
           style={{ display: "none" }}
         />
       </div>
 
-      <button
-        onClick={handleCalcular}
-        disabled={loading}
-        className={`w-full py-2 rounded text-white font-bold ${
-          loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
+      <button onClick={handleCalcular} disabled={loading}>
         {loading ? "Enviando..." : "Calcular"}
       </button>
-
-      {resultado && (
-        <div className="bg-gray-100 text-gray-800 mt-4 p-4 rounded shadow">
-          <h2 className="text-lg font-bold mb-2">Resultado:</h2>
-          <pre className="whitespace-pre-line">{resultado}</pre>
-        </div>
-      )}
     </div>
   );
 }
